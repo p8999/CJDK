@@ -1,0 +1,5 @@
+# کامپایل کد Java
+javac Main.java
+
+# اجرای برنامه Java که کد C را نیز فراخوانی می‌کند
+java Main
