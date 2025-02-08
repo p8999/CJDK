@@ -1,0 +1,2 @@
+# ساخت فایل C
+gcc -shared -fPIC -o libprocess.so process.c -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux
