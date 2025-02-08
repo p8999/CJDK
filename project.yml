@@ -1,0 +1,29 @@
+name: CJDK
+description: A combined programming language using Java and C for data processing.
+version: 1.0.0
+
+authors:
+  - "Your Name"
+  - "Contributor Name"
+
+license: MIT
+
+dependencies:
+  java_version: "11"
+  c_compiler: "GCC"
+  jdk: "openjdk-11"
+  
+scripts:
+  build:
+    - "javac Main.java"
+    - "gcc -shared -fPIC -o libprocess.so process.c -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux"
+  run:
+    - "java Main"
+
+issues:
+  - "https://github.com/your-username/cjdk/issues"
+  - "Submit pull requests for contributing to the project."
+
+support:
+  email: "your-email@example.com"
+  contact: "https://github.com/your-username"
