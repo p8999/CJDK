@@ -74,5 +74,5 @@ CJDK provides a unique approach to programming by combining the best aspects of 
 
 ---
 
-Feel free to copy and paste this into your GitHub README file! You can always adjust or add any additional details based on the current state of the language or any specific features you’d like to highlight. Let me know if you'd like any further adjustments!
+
 
