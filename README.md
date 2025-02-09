@@ -11,8 +11,7 @@
 1. Ensure **Java** (OpenJDK 11) and **GCC** are installed on your system.
 2. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/cjdk.git
-   cd cjdk
+   git clone https://github.com/p8999/CJDK.git
 Sure! Here's a clear and structured explanation in English that you can use for your GitHub repository:
 
 
