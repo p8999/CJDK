@@ -20,6 +20,11 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # جلوگیری از shallow clone
+
+      - name: Fetch all history for proper Gradle execution
+        run: git fetch --unshallow
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -34,13 +39,25 @@ jobs:
         if: runner.os != 'Windows'
         run: chmod +x gradlew
 
-      - name: Build Java & C with Gradle
+      - name: Build Java & C with Gradle (Linux/Mac)
+        if: runner.os != 'Windows'
         run: ./gradlew assembleDebug
         shell: bash
 
-      - name: Run Java Unit Tests
+      - name: Build Java & C with Gradle (Windows)
+        if: runner.os == 'Windows'
+        run: gradlew.bat assembleDebug
+        shell: cmd
+
+      - name: Run Java Unit Tests (Linux/Mac)
+        if: runner.os != 'Windows'
         run: ./gradlew test
         shell: bash
+
+      - name: Run Java Unit Tests (Windows)
+        if: runner.os == 'Windows'
+        run: gradlew.bat test
+        shell: cmd
 
       - name: Run Native C Tests (if available)
         run: |
