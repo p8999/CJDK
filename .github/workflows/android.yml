@@ -1,4 +1,4 @@
-name: Android CL
+name: CJDK CI (Windows + Linux + Android)
 
 on:
   push:
@@ -10,8 +10,12 @@ on:
 
 jobs:
   build:
-    name: Build & Test CJDK (Java + C)
-    runs-on: ubuntu-latest
+    name: Build & Test CJDK on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout Repository
@@ -23,16 +27,22 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android NDK & CMake
+      - name: Set up CMake & NDK (Linux Only)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build
           echo "NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
 
+      - name: Set up CMake (Windows Only)
+        if: matrix.os == 'windows-latest'
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Grant execute permission for Gradle
+      - name: Grant execute permission for Gradle (Linux Only)
+        if: matrix.os == 'ubuntu-latest'
         run: chmod +x gradlew
 
       - name: Build Java & C with Gradle
@@ -55,7 +65,8 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Debug APK & Native Libs
+          name: Build Outputs (${{ matrix.os }})
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             build/lib*.so
+            build/*.dll
