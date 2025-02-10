@@ -1,4 +1,4 @@
-name: CJDK CI (Windows + Linux + Android)
+name: Android CL
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build & Test CJDK on ${{ matrix.os }}
+    name: Build & Test CJDK (Java + C)
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -19,34 +19,37 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up CMake & NDK (Linux Only)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Set up Android NDK & CMake (Ubuntu)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build
           echo "NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
 
-      - name: Set up CMake (Windows Only)
-        if: matrix.os == 'windows-latest'
-        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-
       - name: Set up Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3  # نسخه جدید
 
-      - name: Grant execute permission for Gradle (Linux Only)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Grant execute permission for Gradle (Linux/macOS)
+        if: runner.os != 'Windows'
         run: chmod +x gradlew
 
-      - name: Build Java & C with Gradle
+      - name: Build Java & C with Gradle (Linux/macOS)
+        if: runner.os != 'Windows'
         run: ./gradlew assembleDebug
+
+      - name: Build Java & C with Gradle (Windows)
+        if: runner.os == 'Windows'
+        run: gradlew.bat assembleDebug
 
       - name: Run Java Unit Tests
         run: ./gradlew test
@@ -61,12 +64,12 @@ jobs:
           else
             echo "No CMakeLists.txt found, skipping native tests."
           fi
+        shell: bash
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Build Outputs (${{ matrix.os }})
+          name: Debug APK & Native Libs
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             build/lib*.so
-            build/*.dll
