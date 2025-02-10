@@ -20,39 +20,27 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android NDK & CMake (Ubuntu)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build
-          echo "NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
-
       - name: Set up Gradle
-        uses: gradle/gradle-build-action@v3  # نسخه جدید
+        uses: gradle/actions/setup-gradle@v3
 
-      - name: Grant execute permission for Gradle (Linux/macOS)
+      - name: Grant execute permission for Gradle (Linux/Mac)
         if: runner.os != 'Windows'
         run: chmod +x gradlew
 
-      - name: Build Java & C with Gradle (Linux/macOS)
-        if: runner.os != 'Windows'
+      - name: Build Java & C with Gradle
         run: ./gradlew assembleDebug
-
-      - name: Build Java & C with Gradle (Windows)
-        if: runner.os == 'Windows'
-        run: gradlew.bat assembleDebug
+        shell: bash
 
       - name: Run Java Unit Tests
         run: ./gradlew test
+        shell: bash
 
       - name: Run Native C Tests (if available)
         run: |
